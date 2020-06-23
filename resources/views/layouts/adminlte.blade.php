@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <meta name="_token" content="{{ csrf_token() }}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <title>قسم اللغة العربية وآدابها، جامعة دار الهدى الإسلامية</title>
   <link rel="shortcut icon" href="{{ asset('img/logo.jpg') }}" type="image/x-icon">
@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="{{ asset('css/custom-style.css') }}">
 
   <script>
-    window.BASE_URL = {{ url('/') }}
+    window.BASE_URL = "{{ url('/') }}";
   </script>
 
 </head>

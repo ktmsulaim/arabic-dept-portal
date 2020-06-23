@@ -116,6 +116,8 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         if ($user->delete()) {
+            return response(UserResource::make($user), 200);
+        } else {
             return response(UserResource::make($user), 401);
         }
     }

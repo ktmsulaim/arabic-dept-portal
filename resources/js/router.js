@@ -2,6 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from './components/Login/Login'
 import Home from './components/Pages/Home'
+import Users from './components/Pages/users/Index'
+import AddUser from './components/Pages/users/AddUser'
 
 
 Vue.use(VueRouter)
@@ -25,11 +27,13 @@ export default new VueRouter({
         },
         {
             path: '/users',
-            name: 'Users'
+            name: 'Users',
+            component: Users
         },
         {
             path: '/users/add',
-            name: 'NewUser'
+            name: 'NewUser',
+            component: AddUser
         }
     ]
 })

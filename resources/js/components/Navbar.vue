@@ -51,7 +51,7 @@
 export default {
     data() {
         return {
-            csrf: $('meta[name=_token]').attr('content'),
+            csrf: $('meta[name=csrf-token]').attr('content'),
             base: window.BASE_URL
         }
     },

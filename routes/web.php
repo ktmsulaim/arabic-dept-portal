@@ -16,6 +16,6 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes(['register' => false]);
 
-Route::get('/{any}', 'HomeController@index')->where('any', '.*');
+Route::get('/{any}', 'HomeController@index')->where('any', '.*')->middleware(['auth']);
 
 // Route::get('/home', 'HomeController@index')->name('home');

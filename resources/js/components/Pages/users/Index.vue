@@ -162,6 +162,7 @@ export default {
     data() {
         return {
             csrf: $('meta[name=csrf-token]').attr('content'),
+            api_token: window.api_token,
             users: null,
             user:{
                 id: null,
@@ -169,7 +170,8 @@ export default {
                 username: null,
                 email: null,
                 password: null,
-                is_admin: null
+                is_admin: null,
+                api_token: window.api_token
             },
             feedback: null,
             response: {
@@ -181,7 +183,7 @@ export default {
     },
     methods: {
         getUser(id) {
-            axios.get('/api/users/' + id)
+            axios.get('/api/users/' + id + '?api_token=' + this.api_token)
             .then(resp => {
                 const data = resp.data.data;
                 this.user.id = data.id
@@ -193,7 +195,7 @@ export default {
             .catch(error => console.log(error))
         },
         listUsers(){
-            axios.get('/api/users')
+            axios.get('/api/users' + '?api_token=' + this.api_token)
             .then(resp => {
                 this.users = resp.data.data
                 
@@ -251,6 +253,7 @@ export default {
                    username: this.user.username,
                    email: this.user.email,
                    is_admin: this.user.is_admin,
+                   api_token: this.api_token
                })
                 .then(resp => {
                     this.clearUserData()
@@ -276,7 +279,7 @@ export default {
         },
         deleteUser(id){
             if(id){
-                axios.delete('/api/users/' + id)
+                axios.delete('/api/users/' + id + '?api_token=' + this.api_token)
                 .then(() => {                    
                     this.clearUserData()
                     this.listUsers()

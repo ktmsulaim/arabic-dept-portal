@@ -4,6 +4,7 @@ import Login from './components/Login/Login'
 import Home from './components/Pages/Home'
 import Users from './components/Pages/users/Index'
 import AddUser from './components/Pages/users/AddUser'
+import Batches from './components/Pages/batches/Index'
 
 
 Vue.use(VueRouter)
@@ -34,6 +35,11 @@ export default new VueRouter({
             path: '/users/add',
             name: 'NewUser',
             component: AddUser
+        },
+        {
+            path: '/batches',
+            name: 'Batches',
+            component: Batches
         }
     ]
 })

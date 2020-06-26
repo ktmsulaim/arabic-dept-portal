@@ -10,6 +10,6 @@ const app = new Vue({
     el: '#app',
     router,
     components: {
-        Navbar
+        Navbar,
     }
 });

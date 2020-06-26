@@ -23,6 +23,7 @@
 
   <script>
     window.BASE_URL = "{{ url('/') }}";
+    window.api_token = "{{ auth()->user()->api_token}}";
   </script>
 
 </head>

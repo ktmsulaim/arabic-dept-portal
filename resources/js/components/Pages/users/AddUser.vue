@@ -9,8 +9,13 @@
                     </div>
                 </div>
                 <div class="card-body">                    
-                    <div class="mb-2">
-                        <p v-if="feedback" class="text-danger">{{ feedback }}</p>
+                    <div class="mb-2" v-if="feedback">
+                        <p class="text-danger" v-if="feedback">{{ feedback }}</p>
+                    </div>
+                    <div class="errors" v-if="errors.length > 0">
+                        <div class="text-danger"  v-for="(error, index) in errors" :key="index">
+                            <p v-for="(err, i) in error" :key="i"> {{ err }} </p>
+                        </div>
                     </div>
                     <form @submit.prevent="addUser" id="editUser">
                         <input type="hidden" name="_token" :value="csrf">
@@ -62,9 +67,11 @@ export default {
                 username: null,
                 email: null,
                 password: null,
-                is_admin: null
+                is_admin: null,
+                api_token: window.api_token
             },
             feedback: null,
+            errors: []
         }
     },
     methods: {
@@ -83,7 +90,8 @@ export default {
                         this.$router.push({name: 'Users'})
                     })
                     .catch(error => {
-                        console.log(error)
+                        console.log(error.response.data.errors)
+                        this.errors.push(error.response.data.errors)
                     })
                 }
             } else {

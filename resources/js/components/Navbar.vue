@@ -11,9 +11,38 @@
     </li>
     <li class="nav-item has-treeview">
         <a href="#" class="nav-link">
-        <i class="nav-icon fa fa-dashboard"></i>
+        <i class="nav-icon fa fa-users"></i>
         <p>
             المستخدمون
+            <i class="right fa fa-angle-left"></i>
+        </p>
+        </a>
+        <ul class="nav nav-treeview">
+            <li class="nav-item">
+                <router-link :to="{name: 'NewUser'}" class="nav-link">
+                    <i class="fa fa-circle-o nav-icon"></i>
+                    <p>اعمل جديد</p>
+                </router-link>
+            </li>
+            <li class="nav-item">
+                <router-link :to="{name: 'Users'}" class="nav-link">
+                    <i class="fa fa-circle-o nav-icon"></i>
+                    <p>عرض الكل</p>
+                </router-link>
+            </li>
+        </ul>
+    </li>
+    <li class="nav-item">
+        <router-link :to="{name:'Batches'}" class="nav-link">
+            <i class="fa fa-circle-o nav-icon"></i>
+            <p>دفعات</p>
+        </router-link>
+    </li>
+    <li class="nav-item has-treeview">
+        <a href="#" class="nav-link">
+        <i class="nav-icon fa fa-graduation-cap"></i>
+        <p>
+            الباحثون
             <i class="right fa fa-angle-left"></i>
         </p>
         </a>

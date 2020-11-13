@@ -19,4 +19,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-Route::apiResource('users', 'UserController')->middleware('auth:api');
+Route::group(['middleware' => ['auth:api']], function () {
+    Route::get('/batches/{batch}/students', 'BatchController@getStudents');
+    Route::get('/students/{student}/jobs', 'JobController@getByStudent');
+
+    Route::apiResources([
+        'users' => 'UserController',
+        'batches' => 'BatchController',
+        'students' => 'StudentController',
+        'photos' => 'PhotoController',
+        'jobs' => 'JobController'
+    ]);
+});

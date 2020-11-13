@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Batch as BatchCollection;
 use App\Batch;
+use App\Http\Resources\Student;
 use Illuminate\Http\Request;
 
 class BatchController extends Controller
@@ -14,7 +16,22 @@ class BatchController extends Controller
      */
     public function index()
     {
-        //
+        $batches = Batch::all();
+        return BatchCollection::collection($batches);
+    }
+
+    /**
+     * Display students by batch
+     * 
+     * @param Batch $batch
+     * @return \Illuminate\Http\Response
+     */
+
+    public function getStudents(Batch $batch)
+    {
+        $students = $batch->students;
+
+        return Student::collection($students);
     }
 
     /**
@@ -24,7 +41,6 @@ class BatchController extends Controller
      */
     public function create()
     {
-        //
     }
 
     /**
@@ -35,7 +51,14 @@ class BatchController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'start' => 'required',
+            'end' => 'required'
+        ]);
+
+        $batch = Batch::create($data);
+        return new BatchCollection($batch);
     }
 
     /**
@@ -44,9 +67,10 @@ class BatchController extends Controller
      * @param  \App\Batch  $batch
      * @return \Illuminate\Http\Response
      */
-    public function show(Batch $batch)
+    public function show($id)
     {
-        //
+        $batch = Batch::findOrFail($id);
+        return new BatchCollection($batch);
     }
 
     /**
@@ -67,9 +91,19 @@ class BatchController extends Controller
      * @param  \App\Batch  $batch
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Batch $batch)
+    public function update(Request $request, $id)
     {
-        //
+        $batch = Batch::findOrFail($id);
+
+        // Validate input data
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'start' => 'required',
+            'end' => 'required'
+        ]);
+
+        $batch->update($data);
+        return new BatchCollection($batch);
     }
 
     /**
@@ -78,8 +112,14 @@ class BatchController extends Controller
      * @param  \App\Batch  $batch
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Batch $batch)
+    public function destroy($id)
     {
-        //
+        $batch = Batch::findOrFail($id);
+
+        if ($batch->delete()) {
+            return response(new BatchCollection($batch), 200);
+        } else {
+            return response(new BatchCollection($batch), 500);
+        }
     }
 }

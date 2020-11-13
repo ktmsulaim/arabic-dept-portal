@@ -25,6 +25,10 @@
     },
     "dependencies": {
         "moment": "^2.27.0",
-        "vue-router": "^3.3.4"
+        "vee-validate": "^3.4.2",
+        "vue-cropperjs": "^4.1.0",
+        "vue-router": "^3.3.4",
+        "vue-toast-notification": "^0.5.4",
+        "vuejs-datepicker": "^1.6.2"
     }
 }

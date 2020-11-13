@@ -35,7 +35,15 @@ class PhotoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $image = new Photo();
+        $filename = $image->createFromBase64($request->filename);
+        $photo = $image->create([
+            'student_id' => $request->student_id,
+            'filename' => $filename,
+            'status' => $request->status
+        ]);
+
+        return $photo;
     }
 
     /**
@@ -69,7 +77,9 @@ class PhotoController extends Controller
      */
     public function update(Request $request, Photo $photo)
     {
-        //
+        $photo->update($request->all());
+        $photo->fresh();
+        return $photo;
     }
 
     /**
@@ -80,6 +90,7 @@ class PhotoController extends Controller
      */
     public function destroy(Photo $photo)
     {
-        //
+        $photo->deleteWithFile();
+        return response([], 204);
     }
 }

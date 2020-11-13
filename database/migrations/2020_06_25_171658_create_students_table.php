@@ -20,6 +20,9 @@ class CreateStudentsTable extends Migration
             $table->string('address');
             $table->string('email');
             $table->string('phone');
+            $table->string('dob')->nullable();
+            $table->string('enroll_no')->nullable();
+            $table->string('exam_no')->nullable();
             $table->string('enrolled_year');
             $table->string('year_of_completion')->nullable();
             $table->string('ug_institute');

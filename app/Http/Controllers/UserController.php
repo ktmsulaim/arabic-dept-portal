@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\User as UserResource;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -50,7 +51,8 @@ class UserController extends Controller
             'username' => $request->username,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'is_admin' => $request->is_admin
+            'is_admin' => $request->is_admin,
+            'api_token' => Str::random(60)
         ]);
 
         return UserResource::make($user);
@@ -98,6 +100,11 @@ class UserController extends Controller
         } else {
             // To avoid blank passwords, save all data except password
             $input = $request->except('password');
+        }
+
+        // If user hasn't an api token create one
+        if(empty($user->api_token)){
+            $user->api_token = Str::random(60);
         }
         // Updating user with corresponding data
         $user->update($input);

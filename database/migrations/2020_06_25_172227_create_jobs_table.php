@@ -17,7 +17,9 @@ class CreateJobsTable extends Migration
             $table->increments('id');
             $table->integer('student_id')->unsigned()->index();
             $table->string('name');
-            $table->string('type');
+            $table->string('place');
+            $table->string('start_date');
+            $table->string('end_date')->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();
 

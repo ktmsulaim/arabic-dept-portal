@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Job as ResourcesJob;
 use App\Job;
+use App\Student;
 use Illuminate\Http\Request;
 
 class JobController extends Controller
@@ -15,6 +17,15 @@ class JobController extends Controller
     public function index()
     {
         //
+    }
+
+    /**
+     * Display a list of resource by student
+     */
+    public function getByStudent(Student $student)
+    {
+        $jobs = $student->jobs;
+        return ResourcesJob::collection($jobs);
     }
 
     /**
@@ -35,7 +46,8 @@ class JobController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $job = Job::create($this->data());
+        return new ResourcesJob($job);
     }
 
     /**
@@ -69,7 +81,9 @@ class JobController extends Controller
      */
     public function update(Request $request, Job $job)
     {
-        //
+        $job->update($this->data());
+        $job->fresh();
+        return new ResourcesJob($job);
     }
 
     /**
@@ -80,6 +94,20 @@ class JobController extends Controller
      */
     public function destroy(Job $job)
     {
-        //
+        if ($job->delete()) {
+            return response([], 204);
+        }
+    }
+
+    private function data()
+    {
+        return request()->validate([
+            'student_id' => 'required|integer',
+            'name' => 'required',
+            'place' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required_if:status,0',
+            'status' => 'required|integer'
+        ]);
     }
 }

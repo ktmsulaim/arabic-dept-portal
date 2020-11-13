@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Student as ResourcesStudent;
+use App\Photo;
 use App\Student;
 use Illuminate\Http\Request;
 
@@ -14,7 +16,9 @@ class StudentController extends Controller
      */
     public function index()
     {
-        //
+        $students = Student::all();
+
+        return ResourcesStudent::collection($students);
     }
 
     /**
@@ -35,7 +39,24 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $student = Student::create($this->data());
+
+        // save photo
+        if ($request->image) {
+            $filename = Photo::createFromBase64($request->image);
+            $student->photos()->create([
+                'filename' => $filename,
+                'status' => 1
+            ]);
+        }
+        // save jobs
+        if ($request->job && count($request->job) > 0) {
+            foreach ($request->job as $job) {
+                $student->jobs()->create($job);
+            }
+        }
+
+        return new ResourcesStudent($student);
     }
 
     /**
@@ -46,7 +67,7 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
-        //
+        return new ResourcesStudent($student);
     }
 
     /**
@@ -69,7 +90,8 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-        //
+        $student = $student->update($this->data());
+        return new ResourcesStudent($student);
     }
 
     /**
@@ -80,6 +102,36 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-        //
+        // delete photos with file not just the db record
+        if ($student->photos()->exists()) {
+            foreach ($student->photos as $photo) {
+                $photo->deleteWithFile();
+            }
+        }
+
+        $student->delete();
+        return response([], 204);
+    }
+
+    private function data()
+    {
+        $data =  request()->validate([
+            'batch_id' => 'required|integer',
+            'name' => 'required|string',
+            'address' => 'required|string',
+            'email' => 'required|email',
+            'phone' => 'required|string',
+            'enrolled_year' => 'required',
+            'year_of_completion' => 'required',
+            'ug_institute' => 'required',
+            'thesis_subject' => 'required',
+            'status' => 'required|integer'
+        ]);
+
+        $data['dob'] = request()->input('dob');
+        $data['enroll_no'] = request()->input('enroll_no');
+        $data['exam_no'] = request()->input('exam_no');
+
+        return $data;
     }
 }

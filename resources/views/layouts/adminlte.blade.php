@@ -18,8 +18,11 @@
 
   <!-- bootstrap rtl -->
   <link rel="stylesheet" href="{{ asset('css/bootstrap-rtl.min.css') }}">
+
   <!-- template rtl version -->
   <link rel="stylesheet" href="{{ asset('css/custom-style.css') }}">
+
+  <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
   <script>
     window.BASE_URL = "{{ url('/') }}";
@@ -122,7 +125,7 @@
       قسم اللغة العربية وآدابها، جامعة دار الهدى الإسلامية
     </div>
     <!-- Default to the left -->
-    <strong> &copy; {{date('Y')}} <a href="http://github.com/mratwan/">SA Creations</a></strong>
+    <strong> &copy; {{date('Y')}} <a href="javascript:void(0)">SA Creations</a></strong>
   </footer>
 </div>
 <!-- ./wrapper -->
@@ -149,8 +152,6 @@
 <!-- ChartJS 1.0.2 -->
 <script src="{{ asset('plugins/chartjs-old/Chart.min.js') }}"></script>
 
-<!-- PAGE SCRIPTS -->
-<script src="{{ asset('js/pages/dashboard2.js') }}"></script>
 <script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>

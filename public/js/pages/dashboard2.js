@@ -349,4 +349,6 @@ $(function () {
       spotColor: $this.data('spotcolor')
     })
   })
+
+  $('.date-picker').datepicker();
 })

@@ -1,8 +1,31 @@
-// Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
+#user-image {
+    position: relative;
 
-// Variables
-@import 'variables';
+    .crop-icon {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 150px;
+        height: 100%;
+        background-color: rgba(32, 178, 171, 0.65);
+        color: #fff;
+        justify-content: center;
+        align-items: center;
+        transform: translateX(-50%);
+        border-radius: 50%;
+        cursor: pointer;
+        display: none;
+    }
 
-// Bootstrap
-@import '~bootstrap/scss/bootstrap';
+    &:hover .crop-icon {
+        display: flex;
+    }
+}
+
+#student-view {
+    & .image,
+    & .name {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+}

@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Photo as ResourcesPhoto;
+use App\Http\Resources\Student as ResourcesStudent;
 use App\Photo;
+use App\Student;
 use Illuminate\Http\Request;
 
 class PhotoController extends Controller
@@ -17,6 +20,17 @@ class PhotoController extends Controller
         //
     }
 
+    /**
+     * Get photos of a specific student
+     * 
+     * @param int $student_id
+     * @return \Illuminate\Http\Response
+     */
+    public function getByStudent(Student $student)
+    {
+        $photos = $student->photos;
+        return ResourcesPhoto::collection($photos);
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -35,15 +49,20 @@ class PhotoController extends Controller
      */
     public function store(Request $request)
     {
-        $image = new Photo();
-        $filename = $image->createFromBase64($request->filename);
-        $photo = $image->create([
+        $filename = Photo::createFromBase64($request->filename);
+
+        if ($request->status == 1) {
+            $student = Student::find($request->student_id);
+            $this->clearDefault($student);
+        }
+
+        $photo = Photo::create([
             'student_id' => $request->student_id,
             'filename' => $filename,
             'status' => $request->status
         ]);
 
-        return $photo;
+        return new ResourcesPhoto($photo);
     }
 
     /**
@@ -91,6 +110,24 @@ class PhotoController extends Controller
     public function destroy(Photo $photo)
     {
         $photo->deleteWithFile();
-        return response([], 204);
+        $student = $photo->student;
+        return new ResourcesStudent($student);
+    }
+
+
+    private function clearDefault(Student $student)
+    {
+        foreach ($student->photos as $key => $photo) {
+            $photo->update(['status' => 0]);
+        }
+    }
+
+    public function makeProfile(Photo $photo)
+    {
+        $student = $photo->student;
+        $this->clearDefault($student);
+        $photo->update(['status' => 1]);
+        $photo->fresh();
+        return new ResourcesPhoto($photo);
     }
 }

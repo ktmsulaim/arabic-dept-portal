@@ -35,7 +35,12 @@
                 <button class="btn btn-block btn-primary">تعديل</button>
               </div>
               <div class="col-6">
-                <button class="btn btn-block btn-danger">حذف</button>
+                <button
+                  @click="confirm_delete(student.id)"
+                  class="btn btn-block btn-danger"
+                >
+                  حذف
+                </button>
               </div>
             </div>
           </div>
@@ -152,16 +157,65 @@
     </div>
     <div class="row">
       <div class="col-md-6">
-        <Photos />
+        <Photos :student_id="student.id" @updateProfile="updatePhoto($event)" />
       </div>
       <div class="col-md-6">
         <Jobs :student_id="student.id" />
       </div>
     </div>
+
+    <!-- Delete confirm -->
+    <div
+      class="modal fade"
+      id="delete_confirm"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="delete_confirm-label"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="delete_confirmTitle">حذف الباحث</h5>
+            <button
+              type="button"
+              class="close m-0 p-0"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>هل انت متاكد من ذلك؟ لا يمكن التراجع عنه</p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              أغلق
+            </button>
+            <button
+              type="button"
+              :disabled="remove.disabled"
+              @click="deleteStudent"
+              class="btn btn-primary mx-2"
+            >
+              <span v-if="remove.loading">
+                <i class="fa fa-spinner fa-spin"></i> جاري الحفظ
+              </span>
+              <span v-else> حفظ التغييرات </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <div v-else class="row">
     <div class="col-md-12">
-      <p>No student found!</p>
+      <p>لم يتم العثور على باحث!</p>
     </div>
   </div>
 </template>
@@ -180,6 +234,11 @@ export default {
     return {
       loading: true,
       student: null,
+      remove: {
+        selected: null,
+        loading: false,
+        disabled: false,
+      },
     };
   },
   methods: {
@@ -194,9 +253,43 @@ export default {
           .catch((error) => {
             console.error(error);
             this.loading = false;
+            this.$router.push("/students");
           });
       } else {
         this.$router.push("/students");
+      }
+    },
+    updatePhoto($data) {
+      this.student.profile = $data;
+    },
+    confirm_delete(id) {
+      if (id) {
+        this.remove.selected = id;
+        $("#delete_confirm").modal("show");
+      }
+    },
+    deleteStudent() {
+      if (this.remove.selected) {
+        this.remove.loading = true;
+        this.remove.disabled = true;
+
+        axios
+          .delete(
+            `/api/students/${this.remove.selected}?api_token=${window.api_token}`
+          )
+          .then((resp) => {
+            this.remove.loading = false;
+            this.remove.disabled = false;
+            $("#delete_confirm").modal("hide");
+            this.$router.push("/students");
+            this.$toast.success("نجاح");
+          })
+          .catch((error) => {
+            console.log(error);
+            this.remove.loading = false;
+            this.remove.disabled = false;
+            this.$toast.error("آسف، فقد فشل العمل");
+          });
       }
     },
   },

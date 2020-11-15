@@ -22,6 +22,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/batches/{batch}/students', 'BatchController@getStudents');
     Route::get('/students/{student}/jobs', 'JobController@getByStudent');
+    Route::get('/students/{student}/photos', 'PhotoController@getByStudent');
+    Route::post('/photos/{photo}/makeProfile', 'PhotoController@makeProfile');
 
     Route::apiResources([
         'users' => 'UserController',

@@ -100,10 +100,14 @@
             </button>
             <button
               type="button"
+              :disabled="remove.disabled"
               @click="deleteStudent"
               class="btn btn-primary mx-2"
             >
-              حفظ التغييرات
+              <span v-if="remove.loading">
+                <i class="fa fa-spinner fa-spin"></i> جاري الحفظ
+              </span>
+              <span v-else> حفظ التغييرات </span>
             </button>
           </div>
         </div>
@@ -117,12 +121,13 @@ export default {
   name: "StudentsIndex",
   data() {
     return {
-      currentBatch: null,
+      currentBatch: 1,
       batches: [],
       students: [],
-      delete: {
+      remove: {
         selected: null,
         loading: false,
+        disabled: false,
       },
     };
   },
@@ -156,22 +161,31 @@ export default {
     },
     confirm_delete(id) {
       if (id) {
-        this.delete.selected = id;
+        this.remove.selected = id;
         $("#delete_confirm").modal("show");
       }
     },
     deleteStudent() {
-      if (this.delete.selected) {
+      if (this.remove.selected) {
+        this.remove.loading = true;
+        this.remove.disabled = true;
+
         axios
           .delete(
-            `/api/students/${this.delete.selected}?api_token=${window.api_token}`
+            `/api/students/${this.remove.selected}?api_token=${window.api_token}`
           )
           .then((resp) => {
             this.getStudents(this.currentBatch);
+            this.remove.loading = false;
+            this.remove.disabled = false;
             $("#delete_confirm").modal("hide");
+            this.$toast.success("نجاح");
           })
           .catch((error) => {
             console.log(error);
+            this.remove.loading = false;
+            this.remove.disabled = false;
+            this.$toast.error("آسف، فقد فشل العمل");
           });
       }
     },

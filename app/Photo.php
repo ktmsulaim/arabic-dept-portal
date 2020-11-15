@@ -58,4 +58,11 @@ class Photo extends Model
 
         $this->delete();
     }
+
+    public function path()
+    {
+        if ($this->filename) {
+            return asset('uploads/images/' . $this->filename);
+        }
+    }
 }

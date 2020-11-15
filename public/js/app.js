@@ -3299,16 +3299,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "StudentsIndex",
   data: function data() {
     return {
-      currentBatch: null,
+      currentBatch: 1,
       batches: [],
       students: [],
-      "delete": {
+      remove: {
         selected: null,
-        loading: false
+        loading: false,
+        disabled: false
       }
     };
   },
@@ -3337,20 +3342,30 @@ __webpack_require__.r(__webpack_exports__);
     },
     confirm_delete: function confirm_delete(id) {
       if (id) {
-        this["delete"].selected = id;
+        this.remove.selected = id;
         $("#delete_confirm").modal("show");
       }
     },
     deleteStudent: function deleteStudent() {
       var _this3 = this;
 
-      if (this["delete"].selected) {
-        axios["delete"]("/api/students/".concat(this["delete"].selected, "?api_token=").concat(window.api_token)).then(function (resp) {
+      if (this.remove.selected) {
+        this.remove.loading = true;
+        this.remove.disabled = true;
+        axios["delete"]("/api/students/".concat(this.remove.selected, "?api_token=").concat(window.api_token)).then(function (resp) {
           _this3.getStudents(_this3.currentBatch);
 
+          _this3.remove.loading = false;
+          _this3.remove.disabled = false;
           $("#delete_confirm").modal("hide");
+
+          _this3.$toast.success("نجاح");
         })["catch"](function (error) {
           console.log(error);
+          _this3.remove.loading = false;
+          _this3.remove.disabled = false;
+
+          _this3.$toast.error("آسف، فقد فشل العمل");
         });
       }
     },
@@ -3751,6 +3766,10 @@ Object(vee_validate__WEBPACK_IMPORTED_MODULE_1__["extend"])("required", _objectS
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var vue_cropperjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-cropperjs */ "./node_modules/vue-cropperjs/dist/VueCropper.js");
+/* harmony import */ var vue_cropperjs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_cropperjs__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var cropperjs_dist_cropper_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! cropperjs/dist/cropper.css */ "./node_modules/cropperjs/dist/cropper.css");
+/* harmony import */ var cropperjs_dist_cropper_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(cropperjs_dist_cropper_css__WEBPACK_IMPORTED_MODULE_1__);
 //
 //
 //
@@ -3762,12 +3781,438 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "StudentPhotos",
+  props: ["student_id"],
+  components: {
+    VueCropper: vue_cropperjs__WEBPACK_IMPORTED_MODULE_0___default.a
+  },
   data: function data() {
     return {
-      modal: false
+      modal: false,
+      loading: true,
+      photos: [],
+      image: null,
+      cropped: null,
+      view: {
+        modal: false,
+        photo: null
+      },
+      deleteBtn: {
+        loading: false,
+        disabled: false
+      },
+      add: {
+        image: null,
+        cropped: null,
+        preview: null,
+        profile: null,
+        loading: false,
+        disabled: false
+      },
+      profile: {
+        loading: false,
+        disabled: false
+      }
     };
+  },
+  methods: {
+    getPhotos: function getPhotos() {
+      var _this = this;
+
+      this.loading = true;
+
+      if (this.student_id) {
+        axios.get("/api/students/".concat(this.student_id, "/photos?api_token=").concat(window.api_token)).then(function (resp) {
+          _this.photos = resp.data.data;
+          _this.loading = false;
+        })["catch"](function (err) {
+          _this.photos = [];
+          _this.loading = false;
+        });
+      }
+    },
+    viewPhoto: function viewPhoto(id) {
+      if (id) {
+        this.view.photo = this.photos.find(function (ph) {
+          return ph.id == id;
+        });
+        $("#viewPhotos").modal("show");
+      }
+    },
+    clear: function clear() {
+      this.view.modal = false;
+      this.view.photo = null;
+      $("#viewPhotos").modal("hide");
+    },
+    clearAdd: function clearAdd() {
+      this.add = {
+        image: null,
+        cropped: null,
+        preview: null,
+        profile: null,
+        loading: false,
+        disabled: false
+      };
+    },
+    deletePhoto: function deletePhoto() {
+      var _this2 = this;
+
+      if (this.view.photo.id) {
+        this.deleteBtn.loading = true;
+        this.deleteBtn.disabled = true;
+        axios["delete"]("/api/photos/".concat(this.view.photo.id, "?api_token=").concat(window.api_token)).then(function (resp) {
+          _this2.deleteBtn.loading = false;
+          _this2.deleteBtn.disabled = false;
+
+          _this2.clear();
+
+          _this2.$toast.success("نجاح"); // Update photos array
+
+
+          var index = _this2.photos.indexOf(_this2.view.photo);
+
+          _this2.photos.splice(index, 1); // Update student info
+
+
+          _this2.$emit("updateProfile", resp.data.data.profile);
+        })["catch"](function (err) {
+          _this2.deleteBtn.loading = false;
+          _this2.deleteBtn.disabled = false;
+          console.error(err);
+
+          _this2.$toast.error("آسف! العمل: فشل");
+        });
+      }
+    },
+    photoAdd: function photoAdd() {
+      this.clearAdd();
+      $("#addPhoto").modal("show");
+    },
+    setImage: function setImage(e) {
+      var _this3 = this;
+
+      var file = e.target.files[0];
+
+      if (file.type.indexOf("image/") === -1) {
+        alert("الرجاء تحديد ملف صورة");
+        return;
+      }
+
+      if (typeof FileReader === "function") {
+        var reader = new FileReader();
+
+        reader.onload = function (event) {
+          _this3.add.image = event.target.result; // rebuild cropperjs with the updated source
+
+          _this3.$refs.cropper.replace(_this3.add.image);
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        this.$toast.error("آسف، فقد فشل العمل");
+      }
+    },
+    showCropped: function showCropped() {
+      this.add.preview = this.$refs.cropper.getCroppedCanvas().toDataURL();
+      this.add.cropped = this.$refs.cropper.getCroppedCanvas().toDataURL();
+    },
+    save: function save() {
+      var _this4 = this;
+
+      if (this.add.cropped) {
+        this.add.loading = true;
+        this.add.disabled = true;
+        var data = {
+          filename: this.add.cropped,
+          student_id: this.student_id,
+          status: this.add.profile ? 1 : 0
+        };
+        axios.post("/api/photos?api_token=".concat(window.api_token), data).then(function (resp) {
+          _this4.add.loading = false;
+          _this4.add.disabled = false;
+
+          _this4.$emit("updateProfile", resp.data.data.path);
+
+          _this4.photos.push(resp.data.data);
+
+          $("#addPhoto").modal("hide");
+
+          _this4.$toast.success("نجاح");
+        })["catch"](function (err) {
+          _this4.add.loading = false;
+          _this4.add.disabled = false;
+
+          _this4.$toast.error("آسف، فقد فشل العمل");
+        });
+      }
+    },
+    makeProfile: function makeProfile() {
+      var _this5 = this;
+
+      if (this.view.photo) {
+        this.profile.loading = true;
+        this.profile.disabled = true;
+        axios.post("/api/photos/".concat(this.view.photo.id, "/makeProfile?api_token=").concat(window.api_token)).then(function (resp) {
+          var photo = _this5.photos.find(function (ph) {
+            return ph.id == _this5.view.photo.id;
+          });
+
+          var index = _this5.photos.indexOf(photo);
+
+          var newPhoto = resp.data.data;
+
+          _this5.photos.splice(index, 1, newPhoto);
+
+          _this5.$emit("updateProfile", newPhoto.path);
+
+          _this5.profile.loading = false;
+          _this5.profile.disabled = false;
+
+          _this5.clearProfilePic(newPhoto.id);
+
+          _this5.clear();
+
+          _this5.$toast.success("نجاح");
+        })["catch"](function (err) {
+          console.error(err);
+          _this5.profile.loading = false;
+          _this5.profile.disabled = false;
+
+          _this5.$toast.error("آسف، فقد فشل العمل");
+        });
+      }
+    },
+    clearProfilePic: function clearProfilePic(exceptID) {
+      if (this.photos && this.photos.length > 0) {
+        this.photos.forEach(function (photo) {
+          if (exceptID) {
+            if (photo.id != exceptID) {
+              photo.status = 0;
+            }
+          } else {
+            photo.status = 0;
+          }
+        });
+      }
+    }
+  },
+  created: function created() {
+    this.getPhotos();
   }
 });
 
@@ -3952,6 +4397,60 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -3963,7 +4462,12 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       loading: true,
-      student: null
+      student: null,
+      remove: {
+        selected: null,
+        loading: false,
+        disabled: false
+      }
     };
   },
   methods: {
@@ -3977,9 +4481,43 @@ __webpack_require__.r(__webpack_exports__);
         })["catch"](function (error) {
           console.error(error);
           _this.loading = false;
+
+          _this.$router.push("/students");
         });
       } else {
         this.$router.push("/students");
+      }
+    },
+    updatePhoto: function updatePhoto($data) {
+      this.student.profile = $data;
+    },
+    confirm_delete: function confirm_delete(id) {
+      if (id) {
+        this.remove.selected = id;
+        $("#delete_confirm").modal("show");
+      }
+    },
+    deleteStudent: function deleteStudent() {
+      var _this2 = this;
+
+      if (this.remove.selected) {
+        this.remove.loading = true;
+        this.remove.disabled = true;
+        axios["delete"]("/api/students/".concat(this.remove.selected, "?api_token=").concat(window.api_token)).then(function (resp) {
+          _this2.remove.loading = false;
+          _this2.remove.disabled = false;
+          $("#delete_confirm").modal("hide");
+
+          _this2.$router.push("/students");
+
+          _this2.$toast.success("نجاح");
+        })["catch"](function (error) {
+          console.log(error);
+          _this2.remove.loading = false;
+          _this2.remove.disabled = false;
+
+          _this2.$toast.error("آسف، فقد فشل العمل");
+        });
       }
     }
   },
@@ -71107,10 +71645,17 @@ var render = function() {
                   "button",
                   {
                     staticClass: "btn btn-primary mx-2",
-                    attrs: { type: "button" },
+                    attrs: { type: "button", disabled: _vm.remove.disabled },
                     on: { click: _vm.deleteStudent }
                   },
-                  [_vm._v("\n            حفظ التغييرات\n          ")]
+                  [
+                    _vm.remove.loading
+                      ? _c("span", [
+                          _c("i", { staticClass: "fa fa-spinner fa-spin" }),
+                          _vm._v(" جاري الحفظ\n            ")
+                        ])
+                      : _c("span", [_vm._v(" حفظ التغييرات ")])
+                  ]
                 )
               ])
             ])
@@ -71715,23 +72260,420 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c("div", { staticClass: "card" }, [
+    _c("div", { staticClass: "card-header" }, [
+      _c("h3", { staticClass: "card-title" }, [_vm._v("الصور")]),
+      _vm._v(" "),
+      _c("div", { staticClass: "card-tools" }, [
+        _c(
+          "span",
+          { staticClass: "btn btn-tool", on: { click: _vm.photoAdd } },
+          [_c("i", { staticClass: "fa fa-fw fa-plus" }), _vm._v(" اضف جديد")]
+        )
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "card-body" }, [
+        _vm.loading
+          ? _c("div", [
+              _c("i", { staticClass: "fa fa-spin fa-spinner" }),
+              _vm._v(" جار التحميل\n      ")
+            ])
+          : _vm.photos && _vm.photos.length > 0
+          ? _c("div", [
+              _c(
+                "div",
+                { staticClass: "row", attrs: { id: "student-photos" } },
+                _vm._l(_vm.photos, function(photo) {
+                  return _c("div", { key: photo.id, staticClass: "col-md-4" }, [
+                    _c("div", { staticClass: "image" }, [
+                      _c("img", {
+                        staticClass: "img-fluid",
+                        attrs: { src: photo.path }
+                      }),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "info" }, [
+                        _c("div", { staticClass: "date small" }, [
+                          _c("i", { staticClass: "fa fa-calendar fa-fw" }),
+                          _vm._v(" "),
+                          _c("span", { staticClass: "mx-2" }, [
+                            _vm._v(_vm._s(photo.date))
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "time small" }, [
+                          _c("i", { staticClass: "fa fa-clock-o fa-fw" }),
+                          _vm._v(" "),
+                          _c("span", { staticClass: "mx-2" }, [
+                            _vm._v(_vm._s(photo.time))
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "text-center mt-3" }, [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-sm btn-block btn-primary",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.viewPhoto(photo.id)
+                                }
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                    عرض\n                  "
+                              )
+                            ]
+                          )
+                        ])
+                      ])
+                    ])
+                  ])
+                }),
+                0
+              )
+            ])
+          : _c("div", [
+              _c("p", { staticClass: "text-muted" }, [
+                _vm._v("لم يتم إضافة أي وظيفة")
+              ])
+            ])
+      ])
+    ]),
+    _vm._v(" "),
+    _vm.view.photo
+      ? _c(
+          "div",
+          {
+            ref: "view",
+            staticClass: "modal fade",
+            attrs: {
+              id: "viewPhotos",
+              tabindex: "-1",
+              role: "dialog",
+              "aria-labelledby": "viewPhotos-label",
+              "aria-hidden": "true"
+            }
+          },
+          [
+            _c(
+              "div",
+              {
+                staticClass: "modal-dialog modal-dialog-centered",
+                attrs: { role: "document" }
+              },
+              [
+                _c("div", { staticClass: "modal-content" }, [
+                  _vm._m(0),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c("div", { staticClass: "image text-center" }, [
+                      _c("img", {
+                        staticClass: "img-fluid",
+                        attrs: {
+                          src: _vm.view.photo.path,
+                          alt: _vm.view.photo.filename
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "photo-info mt-3" }, [
+                      _c("div", { staticClass: "date" }, [
+                        _c("i", { staticClass: "fa fa-calendar fa-fw" }),
+                        _vm._v(" "),
+                        _c("span", { staticClass: "mx-2" }, [
+                          _vm._v(_vm._s(_vm.view.photo.date))
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "time" }, [
+                        _c("i", { staticClass: "fa fa-clock-o fa-fw" }),
+                        _vm._v(" "),
+                        _c("span", { staticClass: "mx-2" }, [
+                          _vm._v(_vm._s(_vm.view.photo.time))
+                        ])
+                      ])
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "modal-footer justify-content-between" },
+                    [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-danger",
+                          attrs: { disabled: _vm.deleteBtn.disabled },
+                          on: { click: _vm.deletePhoto }
+                        },
+                        [
+                          _vm.deleteBtn.loading
+                            ? _c("span", [_vm._v("جار الحذف")])
+                            : _c("span", [_vm._v(" حذف ")])
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c("div", [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-secondary",
+                            attrs: { type: "button", "data-dismiss": "modal" }
+                          },
+                          [_vm._v("\n              أغلق\n            ")]
+                        ),
+                        _vm._v(" "),
+                        _vm.view.photo.status == 0
+                          ? _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-primary",
+                                attrs: {
+                                  disabled: _vm.profile.disabled,
+                                  type: "button"
+                                },
+                                on: { click: _vm.makeProfile }
+                              },
+                              [
+                                _vm.profile.loading
+                                  ? _c("span", [_vm._v("جاري الحفظ")])
+                                  : _c("span", [_vm._v("جعل الصورة الشخصية")])
+                              ]
+                            )
+                          : _vm._e()
+                      ])
+                    ]
+                  )
+                ])
+              ]
+            )
+          ]
+        )
+      : _vm._e(),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "addPhoto",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "addPhoto-label",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog modal-dialog-centered modal-lg",
+            attrs: { role: "document" }
+          },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _vm._m(1),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _c("div", { staticClass: "row" }, [
+                  _c(
+                    "div",
+                    { staticClass: "col-md-6" },
+                    [
+                      _vm.add.image
+                        ? _c("vue-cropper", {
+                            ref: "cropper",
+                            attrs: {
+                              src: _vm.add.image,
+                              "aspect-ratio": 1 / 1,
+                              alt: "Image to crop"
+                            },
+                            on: { crop: _vm.showCropped }
+                          })
+                        : _c("span", [_vm._v(" لم يتم اختيار ملف ")])
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", [_vm._v("معاينة:")]),
+                    _vm._v(" "),
+                    _vm.add.preview
+                      ? _c("div", { staticClass: "text-center" }, [
+                          _c("img", {
+                            staticClass: "img-fluid",
+                            attrs: { src: _vm.add.preview }
+                          })
+                        ])
+                      : _vm._e()
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("hr"),
+                _vm._v(" "),
+                _c("div", { staticClass: "row mt-3" }, [
+                  _c("div", { staticClass: "col-12" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("div", { staticClass: "custom-file" }, [
+                        _c("input", {
+                          staticClass: "custom-file-input",
+                          attrs: {
+                            type: "file",
+                            value: "تصفح",
+                            id: "customFile"
+                          },
+                          on: { change: _vm.setImage }
+                        }),
+                        _vm._v(" "),
+                        _c(
+                          "label",
+                          {
+                            staticClass: "custom-file-label",
+                            attrs: { for: "customFile" }
+                          },
+                          [_vm._v("اختيار ملف")]
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("div", { staticClass: "form-check" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.add.profile,
+                              expression: "add.profile"
+                            }
+                          ],
+                          staticClass: "form-check-input",
+                          attrs: { type: "checkbox", id: "makeProfile" },
+                          domProps: {
+                            checked: Array.isArray(_vm.add.profile)
+                              ? _vm._i(_vm.add.profile, null) > -1
+                              : _vm.add.profile
+                          },
+                          on: {
+                            change: function($event) {
+                              var $$a = _vm.add.profile,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = null,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    _vm.$set(
+                                      _vm.add,
+                                      "profile",
+                                      $$a.concat([$$v])
+                                    )
+                                } else {
+                                  $$i > -1 &&
+                                    _vm.$set(
+                                      _vm.add,
+                                      "profile",
+                                      $$a
+                                        .slice(0, $$i)
+                                        .concat($$a.slice($$i + 1))
+                                    )
+                                }
+                              } else {
+                                _vm.$set(_vm.add, "profile", $$c)
+                              }
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c(
+                          "label",
+                          {
+                            staticClass: "form-check-label",
+                            attrs: { for: "makeProfile" }
+                          },
+                          [_vm._v("الصوره الشخصيه")]
+                        )
+                      ])
+                    ])
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary mx-2",
+                    attrs: { type: "button", "data-dismiss": "modal" }
+                  },
+                  [_vm._v("\n            أغلق\n          ")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { disabled: _vm.add.disabled, type: "button" },
+                    on: { click: _vm.save }
+                  },
+                  [
+                    _vm.add.loading
+                      ? _c("span", [_vm._v("جاري الحفظ")])
+                      : _c("span", [_vm._v("حفظ التغييرات")])
+                  ]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
+    )
+  ])
 }
 var staticRenderFns = [
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "card" }, [
-      _c("div", { staticClass: "card-header" }, [
-        _c("h3", { staticClass: "card-title" }, [_vm._v("الصور")]),
-        _vm._v(" "),
-        _c("div", { staticClass: "card-tools" })
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "button",
+        {
+          staticClass: "close m-0 p-0",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c("h5", { staticClass: "modal-title", attrs: { id: "addPhotoTitle" } }, [
+        _vm._v("أضف صورة جديدة")
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "card-body" }),
-      _vm._v(" "),
-      _c("div", { staticClass: "card-footer" })
+      _c(
+        "button",
+        {
+          staticClass: "close m-0 p-0",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
     ])
   }
 ]
@@ -71797,7 +72739,26 @@ var render = function() {
                 ])
               ]),
               _vm._v(" "),
-              _vm._m(0)
+              _c("div", { staticClass: "card-footer" }, [
+                _c("div", { staticClass: "row" }, [
+                  _vm._m(0),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-6" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-block btn-danger",
+                        on: {
+                          click: function($event) {
+                            return _vm.confirm_delete(_vm.student.id)
+                          }
+                        }
+                      },
+                      [_vm._v("\n                حذف\n              ")]
+                    )
+                  ])
+                ])
+              ])
             ])
           ]),
           _vm._v(" "),
@@ -71953,7 +72914,21 @@ var render = function() {
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col-md-6" }, [_c("Photos")], 1),
+          _c(
+            "div",
+            { staticClass: "col-md-6" },
+            [
+              _c("Photos", {
+                attrs: { student_id: _vm.student.id },
+                on: {
+                  updateProfile: function($event) {
+                    return _vm.updatePhoto($event)
+                  }
+                }
+              })
+            ],
+            1
+          ),
           _vm._v(" "),
           _c(
             "div",
@@ -71961,28 +72936,79 @@ var render = function() {
             [_c("Jobs", { attrs: { student_id: _vm.student.id } })],
             1
           )
-        ])
+        ]),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            staticClass: "modal fade",
+            attrs: {
+              id: "delete_confirm",
+              tabindex: "-1",
+              role: "dialog",
+              "aria-labelledby": "delete_confirm-label",
+              "aria-hidden": "true"
+            }
+          },
+          [
+            _c(
+              "div",
+              {
+                staticClass: "modal-dialog modal-dialog-centered",
+                attrs: { role: "document" }
+              },
+              [
+                _c("div", { staticClass: "modal-content" }, [
+                  _vm._m(2),
+                  _vm._v(" "),
+                  _vm._m(3),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-secondary",
+                        attrs: { type: "button", "data-dismiss": "modal" }
+                      },
+                      [_vm._v("\n            أغلق\n          ")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary mx-2",
+                        attrs: {
+                          type: "button",
+                          disabled: _vm.remove.disabled
+                        },
+                        on: { click: _vm.deleteStudent }
+                      },
+                      [
+                        _vm.remove.loading
+                          ? _c("span", [
+                              _c("i", { staticClass: "fa fa-spinner fa-spin" }),
+                              _vm._v(" جاري الحفظ\n            ")
+                            ])
+                          : _c("span", [_vm._v(" حفظ التغييرات ")])
+                      ]
+                    )
+                  ])
+                ])
+              ]
+            )
+          ]
+        )
       ])
-    : _c("div", { staticClass: "row" }, [_vm._m(2)])
+    : _c("div", { staticClass: "row" }, [_vm._m(4)])
 }
 var staticRenderFns = [
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "card-footer" }, [
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-6" }, [
-          _c("button", { staticClass: "btn btn-block btn-primary" }, [
-            _vm._v("تعديل")
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-6" }, [
-          _c("button", { staticClass: "btn btn-block btn-danger" }, [
-            _vm._v("حذف")
-          ])
-        ])
+    return _c("div", { staticClass: "col-6" }, [
+      _c("button", { staticClass: "btn btn-block btn-primary" }, [
+        _vm._v("تعديل")
       ])
     ])
   },
@@ -72036,8 +73062,41 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "delete_confirmTitle" } },
+        [_vm._v("حذف الباحث")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close m-0 p-0",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-body" }, [
+      _c("p", [_vm._v("هل انت متاكد من ذلك؟ لا يمكن التراجع عنه")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
     return _c("div", { staticClass: "col-md-12" }, [
-      _c("p", [_vm._v("No student found!")])
+      _c("p", [_vm._v("لم يتم العثور على باحث!")])
     ])
   }
 ]

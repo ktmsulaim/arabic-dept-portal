@@ -491,7 +491,7 @@
                   class="btn btn-primary mr-2"
                 >
                   <span v-if="submit.loading">
-                    <i class="fa fa-spinner fa-spin"></i> Saving
+                    <i class="fa fa-spinner fa-spin"></i> جاري الحفظ
                   </span>
                   <span v-else> حفظ التغييرات </span>
                 </button>

@@ -90,7 +90,8 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-        $student = $student->update($this->data());
+        $student->update($this->data());
+        $student->fresh();
         return new ResourcesStudent($student);
     }
 

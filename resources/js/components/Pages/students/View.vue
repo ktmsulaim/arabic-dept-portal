@@ -32,7 +32,12 @@
           <div class="card-footer">
             <div class="row">
               <div class="col-6">
-                <button class="btn btn-block btn-primary">تعديل</button>
+                <button
+                  @click="edit(student.id)"
+                  class="btn btn-block btn-primary"
+                >
+                  تعديل
+                </button>
               </div>
               <div class="col-6">
                 <button
@@ -291,6 +296,9 @@ export default {
             this.$toast.error("آسف، فقد فشل العمل");
           });
       }
+    },
+    edit(id) {
+      this.$router.push(`/students/edit/${id}`);
     },
   },
   created() {

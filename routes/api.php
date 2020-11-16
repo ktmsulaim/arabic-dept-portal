@@ -23,7 +23,13 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/batches/{batch}/students', 'BatchController@getStudents');
     Route::get('/students/{student}/jobs', 'JobController@getByStudent');
     Route::get('/students/{student}/photos', 'PhotoController@getByStudent');
+
     Route::post('/photos/{photo}/makeProfile', 'PhotoController@makeProfile');
+    Route::post('/students/search/{q}', 'StudentController@search');
+
+
+    Route::get('/home/counts', 'DashboardController@counts');
+    Route::get('/home/counts/batches', 'DashboardController@batchCounts');
 
     Route::apiResources([
         'users' => 'UserController',

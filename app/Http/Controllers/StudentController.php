@@ -22,6 +22,22 @@ class StudentController extends Controller
     }
 
     /**
+     * Search for a student, string matches name / enroll no / exam no
+     * 
+     */
+    public function search($q)
+    {
+        if ($q) {
+            $students = Student::where('name', 'LIKE', "%$q%")
+                ->orWhere('enroll_no', 'LIKE', "%$q%")
+                ->orWhere('exam_no', 'LIKE', "%$q%")
+                ->get();
+
+            return ResourcesStudent::collection($students);
+        }
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response

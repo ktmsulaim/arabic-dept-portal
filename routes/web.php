@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes(['register' => false]);
 
+Route::get('/test', function () {
+    print_r(\App\Batch::find(1)->students()->count());
+});
+
 Route::get('/{any}', 'HomeController@index')->where('any', '.*')->middleware(['auth']);
 
 // Route::get('/home', 'HomeController@index')->name('home');

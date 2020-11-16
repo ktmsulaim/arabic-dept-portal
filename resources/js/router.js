@@ -9,6 +9,7 @@ import Students from './components/Pages/students/Index'
 import CreateStudent from './components/Pages/students/Create'
 import ViewStudent from './components/Pages/students/View'
 import EditStudent from './components/Pages/students/Edit'
+import Search from './components/Pages/students/Search'
 
 
 Vue.use(VueRouter)
@@ -65,6 +66,12 @@ export default new VueRouter({
             name: 'ViewStudent',
             component: ViewStudent
         },
+        {
+            path: '/search',
+            name: 'Search',
+            component: Search,
+            props: route => ({query: route.query.q})
+        }
         
     ]
 })
